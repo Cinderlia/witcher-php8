@@ -1,0 +1,41 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -1764,6 +1764,7 @@
+     zend_virtual_cwd.c
+     zend_vm_opcodes.c
+     zend_weakrefs.c
++    zend_witcher_trace.c
+     zend.c
+   ]),
+   [-DZEND_ENABLE_STATIC_TSRMLS_CACHE=1 $fiber_asm_cflag])
+--- a/Zend/zend_execute.c
++++ b/Zend/zend_execute.c
+@@ -5518,6 +5518,8 @@
+ # define _zend_vm_stack_push_call_frame    zend_vm_stack_push_call_frame
+ #endif
+
++#include "zend_witcher_trace.h"
++
+ #ifdef ZEND_VM_TRACE_HANDLERS
+ # include "zend_vm_trace_handlers.h"
+ #elif defined(ZEND_VM_TRACE_LINES)
+--- a/sapi/cgi/cgi_main.c
++++ b/sapi/cgi/cgi_main.c
+@@ -87,6 +87,8 @@
+ #include "fastcgi.h"
+ #include "cgi_main_arginfo.h"
+
++extern void witcher_cgi_trace_init(char *ch_shm_id);
++
+ #if defined(PHP_WIN32) && defined(HAVE_OPENSSL_EXT)
+ # include "openssl/applink.c"
+ #endif
+@@ -1767,6 +1769,8 @@
+ # endif
+ #endif
+
++	witcher_cgi_trace_init("__AFL_SHM_ID");
++
+ 	zend_signal_startup();
+
+ #ifdef ZTS
